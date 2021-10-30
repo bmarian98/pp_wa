@@ -171,6 +171,161 @@ namespace InterfataUtilizator
 ## _**Lab 2**_
 <details>
   <summary>Apasati pentru a deschide laboratorul 2!</summary>
+  
+  ### _**Exercitii:**_
+  #### *2. Adaugati o noua forma care sa afiseze toate companiile introduse.*
+  
+  **a. ListaCompanii.aspx**
+  ```csharp
+  <%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ListaCompanii.aspx.cs" Inherits="InterfataUtilizator_WebForms.ListaCompanii" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <section>
+        <div>
+            <hgroup>
+                <h2><%: Page.Title %></h2>
+            </hgroup>
+
+            <asp:ListView ID="productList" runat="server" 
+                DataKeyNames="IdCompanie" GroupItemCount="4"
+                ItemType="LibrarieModele.Companie" SelectMethod="GetCompanii">
+                <EmptyDataTemplate>
+                    <table >
+                        <tr>
+                            <td>Nu a fost gasita nici o companie.</td>
+                        </tr>
+                    </table>
+                </EmptyDataTemplate>
+                <EmptyItemTemplate>
+                    <td/>
+                </EmptyItemTemplate>
+                <GroupTemplate>
+                    <tr id="itemPlaceholderContainer" runat="server">
+                        <td id="itemPlaceholder" runat="server"></td>
+                    </tr>
+                </GroupTemplate>
+                <ItemTemplate>
+                    <td runat="server">
+                        <table>
+                            <tr>
+                                <td>
+                                    <a href="ProductDetails.aspx?productID=<%#:Item.IdCompanie%>">
+                                        <img src="./Resources/Images/<%#:Item.Nume%>.jpg"
+                                            width="100" height="75" style="border: solid" /></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="ProductDetails.aspx?productID=<%#:Item.IdCompanie%>">
+                                        <span>
+                                            <%#:Item.Nume%>
+                                        </span>
+                                    </a>
+                                    <br />
+                                    <span>
+                                        <b>Adresa: </b><%#:Item.Adresa%>
+                                    </span>
+                                    <br />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="ProductDetails.aspx?productID=<%#:Item.IdCompanie%>">
+                                    </a>
+                                    <br />
+                                    <span>
+                                        <b>Email: </b><%#:Item.Email%>
+                                    </span>
+                                    <br />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="ProductDetails.aspx?productID=<%#:Item.IdCompanie%>">
+                                    </a>
+                                    <br />
+                                    <span>
+                                        <b>Telefon: </b><%#:Item.Telefon%>
+                                    </span>
+                                    <br />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </table>
+                        </p>
+                    </td>
+                </ItemTemplate>
+                <LayoutTemplate>
+                    <table style="width:100%;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table id="groupPlaceholderContainer" runat="server" style="width:100%">
+                                        <tr id="groupPlaceholder"></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                            <tr></tr>
+                        </tbody>
+                    </table>
+                </LayoutTemplate>
+            </asp:ListView>
+        </div>
+    </section>
+</asp:Content>
+ ```
+**b. Lista Companii.aspx.cs**
+  ```cshar
+  namespace InterfataUtilizator_WebForms
+{
+    public partial class ListaCompanii : System.Web.UI.Page
+    {
+        //initializare obiecte utilizate pentru salvarea datelor in baza de date (sau alte medii de stocare...daca exista implementare corespunzatoare)
+        IStocareCompanii stocareCompanii = (IStocareCompanii)new StocareFactory().GetTipStocare(typeof(Companie));
+        IStocareMasini stocareMasini = (IStocareMasini)new StocareFactory().GetTipStocare(typeof(Masina));
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+        public IQueryable<Companie> GetCompanii()
+        {
+            return stocareCompanii.GetCompanii().AsQueryable();
+        }
+    } // parial class ListaCompanii
+} // namespace InterfataUtilizator_WebForms
+  ```
+**c. ListaCompanii.aspx.designer.cs**
+  ```cshar
+  namespace InterfataUtilizator_WebForms
+{
+    public partial class ListaCompanii
+    {
+        protected global::System.Web.UI.WebControls.ListView productList;
+    } 
+}
+  ```
+  
+  **d. Site.Master**
+  ```html
+  <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+          <li><a runat="server" href="~/">Home</a></li>
+          <li><a runat="server" href="~/ListaMasini">Lista masini</a></li>
+          <li><a runat="server" href="~/ListaCompanii">Lista companii</a></li> <!--Adaugare tab lista companii-->
+          <li><a runat="server" href="~/AdaugareCompanie">AdaugareCompanie</a></li>
+      </ul>
+  </div>
+  ```
+  
+  ### *Rezultate:*
+  
+  ![SiteMaster](https://user-images.githubusercontent.com/39569343/139533821-cb855d9b-a85b-41cc-a8b6-6a7337ee6749.png)
+  
 </details>
 
 ## _**Lab 3**_
