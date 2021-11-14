@@ -279,7 +279,7 @@ namespace InterfataUtilizator
 </asp:Content>
  ```
 **b. Lista Companii.aspx.cs**
-  ```cshar
+  ```csharp
   namespace InterfataUtilizator_WebForms
 {
     public partial class ListaCompanii : System.Web.UI.Page
@@ -300,7 +300,7 @@ namespace InterfataUtilizator
 } // namespace InterfataUtilizator_WebForms
   ```
 **c. ListaCompanii.aspx.designer.cs**
-  ```cshar
+  ```csharp
   namespace InterfataUtilizator_WebForms
 {
     public partial class ListaCompanii
@@ -331,6 +331,107 @@ namespace InterfataUtilizator
 ## _**Lab 3**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 3!</summary>
+  
+  ### _**Exercitii:**_
+  #### _*1. Implementati operatiile de Index si Details pentru entitatea considerata in cadrul proiectului
+propriu utilizand paradigma MVC.*_
+  ##### 1.1 Proiect web de tip mvc - https://github.com/bmarian98/java_mvc
+  ##### 1.2 Controller actiuniile: Index si Details
+  ShelterController.java
+  ```java
+  // ...
+  // index
+  @RequestMapping("/list_shelters")
+	public String list_shelters(Model m) {
+		List<Shelter> list = shelterDao.getShelters();
+		m.addAttribute("list", list);
+		return "list_shelters";
+	}
+  
+  //details
+  @RequestMapping(value = "/edit_shelter/{id}")
+	public String edit(@PathVariable Integer id, Model m) {
+		Shelter shelter = shelterDao.getShelter(id);
+		m.addAttribute("command", shelter);
+
+		return "sheltereditform";
+	}
+  ```
+  
+  ##### 1.3 Adaugare referinta modele si acces date
+  spring-servlet.xml
+  ```xml
+  <beans>
+    <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
+      <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>  
+      <property name="url" value="jdbc:mysql://localhost:3306/mvc"></property>  
+      <property name="username" value="root"></property>  
+      <property name="password" value="new123"></property>  
+    </bean>  
+
+    <bean id="jt" class="org.springframework.jdbc.core.JdbcTemplate">
+     <property name="dataSource" ref="ds"></property>
+    </bean>
+
+    <bean id="shelterDao" class="com.javatpoint.dao.ShelterDao">
+      <property name="template" ref="jt"></property>
+    </bean>
+  </beans>
+  ```
+  
+  ##### 1.4 View-uri
+  
+  ```jsp
+   <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+
+	<h1>Shelters List</h1>
+	<table border="2" width="70%" cellpadding="2">
+	<tr><th>Id</th><th>Name</th><th>Address</th><th>Edit</th><th>Delete</th></tr>
+    <c:forEach var="shelter" items="${list}"> 
+      <tr>
+        <td>${shelter.id}</td>
+        <td>${shelter.name}</td>
+        <td>${shelter.address}</td>
+        <td><a href="editemp/${shelter.id}">Edit</a></td>
+        <td><a href="deleteemp/${shelter.id}">Delete</a></td>
+      </tr>
+    </c:forEach>
+    </table>
+    <br/>
+    <a href="shelterform">Add New Shelter</a>
+  ```
+  
+  ##### 1.5 Testare
+  ![Shelter](https://user-images.githubusercontent.com/39569343/141698695-81efe508-7618-43ad-9a17-4ae639056724.png)
+      
+  ![save](https://user-images.githubusercontent.com/39569343/141698738-2e2006ff-becb-41a2-8255-9a49f0ca5b7e.png)
+      
+ #### _*2. Implementati operatiile de Create si Edit pentru entitatea considerata in cadrul proiectului
+propriu utilizand paradigma MVC.*_
+ ##### Create si Save
+ ShelterController
+ ```java
+      @Controller
+public class ShelterController {
+
+    @Autowired
+    ShelterDao shelterDao;
+
+    @RequestMapping("/shelterform")
+    public String showform(Model m) {
+      m.addAttribute("command", new Shelter());
+      return "shelterform";
+    }
+
+    @RequestMapping(value = "/save_shelter", method = RequestMethod.POST)
+    public String save(@ModelAttribute("shelter") Shelter shelter) {
+      shelterDao.save(shelter);
+      return "redirect:/list_shelters";
+    }
+}
+ ```
+  
 </details>
 
 ## _**Lab 4**_
