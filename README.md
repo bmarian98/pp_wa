@@ -333,28 +333,26 @@ namespace InterfataUtilizator
   <summary>Apasti pentru a deschide laboratorul 3!</summary>
   
   ### _**Exercitii:**_
-  #### _*1. Implementati operatiile de Index si Details pentru entitatea considerata in cadrul proiectului
-propriu utilizand paradigma MVC.*_
+  #### _*1. Implementati operatiile de Index si Details pentru entitatea considerata in cadrul proiectului propriu utilizand paradigma MVC.*_
   ##### 1.1 Proiect web de tip mvc - https://github.com/bmarian98/java_mvc
-  ##### 1.2 Controller actiuniile: Index si Details
+  ##### 1.2 Controller actiunile: Index si Details din Controller
   ShelterController.java
   ```java
   // ...
   // index
-  @RequestMapping("/list_shelters")
-	public String list_shelters(Model m) {
+ @RequestMapping("/list_shelters")
+	public String list(Model m) {
 		List<Shelter> list = shelterDao.getShelters();
 		m.addAttribute("list", list);
 		return "list_shelters";
 	}
   
   //details
-  @RequestMapping(value = "/edit_shelter/{id}")
-	public String edit(@PathVariable Integer id, Model m) {
+  @RequestMapping(value = "/shelter_details/{id}")
+	public String datails(@PathVariable Integer id, Model m) {
 		Shelter shelter = shelterDao.getShelter(id);
 		m.addAttribute("command", shelter);
-
-		return "sheltereditform";
+		return "shelter_details";
 	}
   ```
   
@@ -380,57 +378,170 @@ propriu utilizand paradigma MVC.*_
   ```
   
   ##### 1.4 View-uri
+  a. list_shelters.jsp
+  ```jsp
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+
+<h1>Shelters List</h1>
+<table border="2" width="70%" cellpadding="2">
+	<tr><th>Name</th><th>Details</th><th>Edit</th></tr>
+	<c:forEach var="shelter" items="${list}"> 
+		<tr>
+			<td>${shelter.name}</td>
+			<td><a href="shelter_details/${shelter.id}">Details</a></td>
+			<td><a href="edit_shelter/${shelter.id}">Edit</a></td>
+		</tr>
+	</c:forEach>
+</table>
+<br/>
+<a href="shelterform">Add New Shelter</a>
+  ```
+  b. shelter_detail.jsp
   
   ```jsp
-   <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
-    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
 
-	<h1>Shelters List</h1>
-	<table border="2" width="70%" cellpadding="2">
-	<tr><th>Id</th><th>Name</th><th>Address</th><th>Edit</th><th>Delete</th></tr>
-    <c:forEach var="shelter" items="${list}"> 
-      <tr>
-        <td>${shelter.id}</td>
-        <td>${shelter.name}</td>
-        <td>${shelter.address}</td>
-        <td><a href="editemp/${shelter.id}">Edit</a></td>
-        <td><a href="deleteemp/${shelter.id}">Delete</a></td>
-      </tr>
-    </c:forEach>
-    </table>
-    <br/>
-    <a href="shelterform">Add New Shelter</a>
-  ```
+<h1>Shelter details</h1>
+<table  border="2" width="70%" cellpadding="2">
+	<tr><th>Id</th><th>Name</th><th>Address</th></tr>
+	<tr>
+	    <td><c:out value="${command.id}" /></td>
+	    <td><c:out value="${command.name}" /></td>
+	    <td><c:out value="${command.address}" /></td>  
+      </tr>  
+</table>  
+<a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>    
+  ```	    
   
   ##### 1.5 Testare
-  ![Shelter](https://user-images.githubusercontent.com/39569343/141698695-81efe508-7618-43ad-9a17-4ae639056724.png)
+  a. List view page
+  ![shelter_list1](https://user-images.githubusercontent.com/39569343/142162552-27a15172-47e1-4ddd-b650-fbfe3ffa38ab.png)
       
-  ![save](https://user-images.githubusercontent.com/39569343/141698738-2e2006ff-becb-41a2-8255-9a49f0ca5b7e.png)
+  b. Details view page	
+  ![shelter_details](https://user-images.githubusercontent.com/39569343/142162550-d856542c-0e96-4d42-8aa3-841cdbda3347.png)
       
- #### _*2. Implementati operatiile de Create si Edit pentru entitatea considerata in cadrul proiectului
-propriu utilizand paradigma MVC.*_
- ##### Create si Save
- ShelterController
+ #### _*2. Implementati operatiile de Create si Edit pentru entitatea considerata in cadrul proiectului propriu utilizand paradigma MVC.*_
+ ##### Metodele create si save din Controler
+ ShelterController.java
  ```java
-      @Controller
+@Controller
 public class ShelterController {
 
-    @Autowired
-    ShelterDao shelterDao;
+	@Autowired
+	ShelterDao shelterDao;
 
-    @RequestMapping("/shelterform")
-    public String showform(Model m) {
-      m.addAttribute("command", new Shelter());
-      return "shelterform";
-    }
+	@RequestMapping("/shelterform")
+	public String showform(Model m) {
+		m.addAttribute("command", new Shelter());
+		return "shelterform";
+	}
 
-    @RequestMapping(value = "/save_shelter", method = RequestMethod.POST)
-    public String save(@ModelAttribute("shelter") Shelter shelter) {
-      shelterDao.save(shelter);
-      return "redirect:/list_shelters";
-    }
+	// insereaza datele in baza de date
+	@RequestMapping(value = "/save_shelter", method = RequestMethod.POST)
+	public String save(@ModelAttribute("shelter") Shelter shelter) {
+		System.out.println(shelter);
+		shelterDao.save(shelter);
+		return "redirect:/list_shelters";
+	}
+	
+	// extrage obiectul dupa id din baza de date si permite editarea acestuia
+	@RequestMapping(value = "/edit_shelter/{id}")
+	public String edit(@PathVariable Integer id, Model m) {
+		Shelter shelter = shelterDao.getShelter(id);
+		m.addAttribute("command", shelter);
+
+		return "edit_shelter";
+	}
+
+	// updateaza obiectul si il salveaza in baza de date
+	@RequestMapping(value = "/edit_save_shelter", method = RequestMethod.POST)
+	public String editsave(@ModelAttribute("shelter") Shelter shelter) {
+		shelterDao.update(shelter);
+
+		return "redirect:/list_shelters";
+	}
+
 }
  ```
+##### View-uri pentru adaugare si editare
+a. shelterform.jsp
+```jsp
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>    
+    
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Add new Shelter</title>
+</head>
+<body>
+	<h1>Add shelter</h1>
+	
+	<form:form method="post" action="save_shelter">
+		<table>
+			<tr>
+				<td>Id:</td>
+				<td><form:input path="id" /></td>
+			</tr>
+			<tr>
+				<td>Name:</td>
+				<td><form:input path="name" /></td>
+			</tr>
+			<tr>
+				<td>Address:</td>
+				<td><form:input path="address" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Save" /></td>
+			</tr>
+		</table>
+	</form:form>
+	<a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>
+</body>
+</html>	
+```
+b. edit_helter.java
+```jsp
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+
+<h1>Edit shelter</h1>
+<form:form method="POST" action="/SpringMVCCRUDSimple/edit_save_shelter">  
+<table >  
+	<tr>
+	<td></td>  
+	 	<td><form:hidden  path="id" /></td>
+	 </tr> 
+	 <tr>  
+		  <td>Name : </td> 
+		  <td><form:input path="name"  /></td>
+	 </tr>  
+	 <tr>  
+		  <td>Address :</td>  
+		  <td><form:input path="address" /></td>
+	 </tr> 
+	 <tr>  
+		  <td> </td>  
+		  <td><input type="submit" value="Edit Save" /></td>  
+	 </tr>  
+</table>  
+</form:form>  
+```
+##### Rezultate
+a. Adugare
+	
+![add_shelter](https://user-images.githubusercontent.com/39569343/142162540-efb94a21-90b6-4e3a-8e5d-8e50a2ba50b0.png)
+	
+b. Editare
+	
+![edit_shelter](https://user-images.githubusercontent.com/39569343/142162543-c65bebba-722c-41a2-aa16-b420a896b465.png)
+![list_shelter2](https://user-images.githubusercontent.com/39569343/142162547-23075bdd-d6f0-4ce0-a6b7-3f9e56bf8319.png)
   
 </details>
 
