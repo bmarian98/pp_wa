@@ -335,6 +335,54 @@ namespace InterfataUtilizator
   ### _**Exercitii:**_
   #### _*1. Implementati operatiile de Index si Details pentru entitatea considerata in cadrul proiectului propriu utilizand paradigma MVC.*_
   ##### 1.1 Proiect web de tip mvc - https://github.com/bmarian98/java_mvc
+  Modelul Shelter.java
+  ```java
+public class Shelter {
+
+	@Override
+	public String toString() {
+		return "Shelter [id=" + id + ", name=" + name + ", address=" + address + "]";
+	}
+
+	private Integer id;
+	private String name;
+	private String address;
+
+	public Shelter() {
+	}
+
+	public Shelter(Integer id, String name, String address) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+}
+  ```
   ##### 1.2 Controller actiunile: Index si Details din Controller
   ShelterController.java
   ```java
@@ -548,6 +596,275 @@ b. Editare
 ## _**Lab 4**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 4!</summary>
+	
+### _**Exercitii:**_
+	
+#### *1. Implementati operatiile de Index si Create pentru o a doua entitate considerata in cadrul proiectului propriu. Aceasta entitate trebuie sa contina o cheie straina. In acest fel, modelul implementat va contine date din mai multe tabele (In cadrul exemplului de la curs am considerat MasinaModel).*
+ 
+##### Modelul Pet.java
+```java
+public class Pet {
+	private Integer id;
+	private Integer shelterId;
+	private String name;
+	private String dateBirth;
+	private Character sex;
+
+	public Pet() {
+	}
+
+	public Pet(Integer id, Integer shelterId, String name, String dateBirth, Character sex) {
+		super();
+		this.id = id;
+		this.shelterId = shelterId;
+		this.name = name;
+		this.dateBirth = dateBirth;
+		this.sex = sex;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getShelterId() {
+		return shelterId;
+	}
+
+	public void setShelterId(Integer shelterId) {
+		this.shelterId = shelterId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDateBirth() {
+		return dateBirth;
+	}
+
+	public void setDateBirth(String dateBirth) {
+		this.dateBirth = dateBirth;
+	}
+
+	public Character getSex() {
+		return sex;
+	}
+
+	public void setSex(Character sex) {
+		this.sex = sex;
+	}
+
+	@Override
+	public String toString() {
+		return "Pet [shelterId=" + shelterId + ", name=" + name + ", dateBirth=" + dateBirth + ", sex=" + sex + "]";
+	}
+
+}
+```
+##### Controller-ul PetControler.java
+```java
+@Controller("/pet")
+public class PetController {
+
+	@Autowired
+	PetDao petDao;
+
+	@RequestMapping("/petform")
+	public String showform(Model m) {
+		m.addAttribute("command", new Pet());
+		return "petform";
+	}
+
+	@RequestMapping(value = "/save_pet", method = RequestMethod.POST)
+	public String save(@ModelAttribute("pet") Pet pet) {
+		petDao.save(pet);
+		return "redirect:/list_pets";
+	}
+
+	@RequestMapping("/list_pets")
+	public String list(Model m) {
+		List<Pet> list = petDao.getPets();
+		m.addAttribute("list", list);
+		return "list_pets";
+	}
+
+	@RequestMapping(value = "/pet_details/{id}")
+	public String detilas(@PathVariable int id, Model m) {
+		Pet pet = petDao.getPet(id);
+		m.addAttribute("command", pet);
+		return "pet_details";
+	}
+
+	@RequestMapping(value = "/edit_tmp_pet/{id}")
+	public String edit_tmp_pet(@PathVariable int id, Model m) {
+		Pet pet = petDao.getPet(id);
+		m.addAttribute("command", pet);
+		return "pet_edit_form";
+	}
+
+	@RequestMapping(value = "/edit_save_pet", method = RequestMethod.POST)
+	public String editsave(@ModelAttribute("pet") Pet pet) {
+		petDao.update(pet);
+
+		return "redirect:/list_pets";
+	}
+}		
+```
+##### View-uri pentru list, details, create si edit
+a. Add - petform.jsp
+```jsp
+	<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>    
+    
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Add new Pet</title>
+</head>
+<body>
+	<h1>Add pet</h1>
+	
+	<form:form method="post" action="save_pet">
+		<table>
+			<tr>
+				<td>Id:</td>
+				<td><form:input path="id" /></td>
+			</tr>
+			<tr>
+				<td>Name:</td>
+				<td><form:input path="name" /></td>
+			</tr>
+			<tr>
+				<td>ShelterId:</td>
+				<td><form:input path="shelterId" /></td>
+			</tr>
+			<tr>
+				<td>DateBirth:</td>
+				<td><form:input path="dateBirth" /></td>
+			</tr>
+			<tr>
+				<td>PetSex:</td>
+				<td><form:radiobutton path="sex" value="M" />Mascul</td>
+				<td><form:radiobutton path="sex" value="F" />Femela</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Save" /></td>
+			</tr>
+		</table>
+	</form:form>
+<a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>
+</body>
+</html>
+```
+	
+b.  List - list_pets.jsp
+```jsp
+    <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+
+	<h1>Pets List</h1>
+	<table  border="2" width="70%" cellpadding="2">
+	<tr><th>Pet Id</th><th>Details</th><th>Edit</th></tr>
+    <c:forEach var="pet" items="${list}"> 
+    <tr>
+    <td>${pet.name}</td>
+    <td><a href="pet_details/${pet.id}">Details</a></td>
+    <td><a href="edit_tmp_pet/${pet.id}">Edit</a></td>
+    </tr>
+    </c:forEach>
+    </table>
+    <br/>
+    <a href="petform">Add New Pet</a>
+    <a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>	
+```
+
+c. Details - pet_details.java
+```java
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+
+<h1>Pet details</h1>
+	<table border="2" width="70%" cellpadding="2">
+		<tr><th>Id</th><th>Name</th><th>Shelter_id</th><th>Date birth</th><th>Sex</th></tr>
+	   	<tr>
+		    <td><c:out value="${command.id}" /></td>
+		    <td><c:out value="${command.name}" /></td>
+		    <td><c:out value="${command.shelterId}" /></td>  
+		    <td><c:out value="${command.dateBirth}" /></td>
+		    <td><c:out value="${command.sex}" /></td>
+	      </tr>  
+     </table>  
+     <a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>	    
+```  
+
+d. Edit - pet_edit_form.jsp
+```jsp
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+
+		<h1>Edit pet</h1>
+       <form:form method="POST" action="/SpringMVCCRUDSimple/edit_save_pet">  
+      	<table >  
+      	<tr>
+      	<td></td>  
+        	 <td><form:hidden  path="id" /></td>
+         </tr> 
+         <tr>  
+		  <td>Name : </td> 
+		  <td><form:input path="name"  /></td>
+         </tr>  
+         <tr>  
+		  <td>ShelterId :</td>  
+		  <td><form:input path="shelterId" /></td>
+         </tr> 
+         <tr>  
+		  <td>DateBirth :</td>  
+		  <td><form:input path="dateBirth" /></td>
+         </tr> 
+         <tr>  
+          <td>PetSex:</td>
+		 <td><form:radiobutton path="sex" value="M" />Mascul</td>
+		<td><form:radiobutton path="sex" value="F" />Femela</td>
+         </tr> 
+         
+         <tr>  
+          <td> </td>  
+          <td><input type="submit" value="Edit Save" /></td>  
+         </tr>  
+        </table>  
+       </form:form>  
+       <a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>
+```
+	
+##### Rezultate
+a. Add view
+	
+![Screenshot 2021-11-17 112708](https://user-images.githubusercontent.com/39569343/142173832-ba132080-a7ed-47be-a29e-afce6501c98d.png)
+
+b. List view
+	
+![pet_list_add](https://user-images.githubusercontent.com/39569343/142173008-977e1204-65f2-4e3b-817a-1ce3334cf7a3.png)
+
+c. Edit view
+	
+![edit_pet](https://user-images.githubusercontent.com/39569343/142173001-f767c640-1cb5-4730-821f-6db19c78efbf.png)
+
+d. List view
+
+![list_edit_pet](https://user-images.githubusercontent.com/39569343/142173005-d7533a63-43cf-46d0-a7a5-af1542ee9420.png)
+	
 </details>
 
 ## _**Lab 5**_
