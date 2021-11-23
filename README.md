@@ -955,6 +955,199 @@ d. List view
 ## _**Lab 5**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 5!</summary>
+	
+### _**Exercitii:**_
+	
+#### *1. Implementați operațiile de Get si Get(int id) pentru entitatea considerata in cadrul proiectului propriu utilizând paradigma API.*
+	
+Proiect WEB API
+	
+https://github.com/bmarian98/pp_aw
+	
+Crearea tabelelor din model
+
+Pet.java
+```java
+@Entity
+public class Pet implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
+    private Long id;
+    private String name;
+    private String species;
+    private String dateBirth;
+    private Character sex;
+    private String imageUrl;
+
+    public Pet() {}
+
+    public Pet(Long id, String name, String species, String dateBirth, String imageUrl, Character sex) {
+        this.id = id;
+        this.name = name;
+        this.species = species;
+        this.dateBirth = dateBirth;
+        this.imageUrl = imageUrl;
+        this.sex = sex;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+ // ...
+}
+```
+	
+Shelter.java
+```java
+@Entity
+public class Shelter implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
+    private Long id;
+
+    @OneToMany(
+          cascade = CascadeType.ALL,
+          orphanRemoval = true
+    )
+    private List<Pet> pets = new ArrayList<>();
+    private String name;
+    private String address;
+
+    public Shelter() {}
+
+    public Shelter(Long id, String name, String address) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+    }
+}
+```
+
+PetRepository.java - Repository
+```java
+@Repository
+public interface PetRepository extends JpaRepository<Pet, Long> {
+    void deletePetById(Long id);
+
+    Optional<Pet> findPetById(Long id);
+}
+```
+	
+PetService.java - Service	
+```java
+@Service
+@Transactional
+public class PetService {
+
+    private final PetRepository petRepo;
+
+    @Autowired
+    public PetService(PetRepository petRepo){
+        this.petRepo = petRepo;
+    }
+
+    public Pet addPet(Pet pet){
+        return petRepo.save(pet);
+    }
+
+    public List<Pet> findAllPets(){
+        return petRepo.findAll();
+    }
+
+    public Pet updatePet(Pet pet){
+        return petRepo.save(pet);
+    }
+
+    public void deletePet(Long id){
+        petRepo.deletePetById(id);
+    }
+
+    public Pet findPetById(Long id){
+        return petRepo.findPetById(id).orElseThrow(() -> new UserNotFoundException("Pet with id " + id + " not found"));
+    }
+
+}	
+```
+	
+PetResource.java - RestController
+```java
+@RestController
+@RequestMapping("/pet")
+public class PetResource {
+    private final PetService petService;
+
+    public PetResource(PetService petService){
+        this.petService = petService;
+    }
+
+    // GET pentru toate elementele din table
+    @GetMapping("/all")
+    public ResponseEntity<List<Pet>> getAllPets(){
+        List<Pet> pets = petService.findAllPets();
+        return new ResponseEntity<>(pets, HttpStatus.OK);
+    }
+
+    // GET cu ID
+    @GetMapping("/find/{id}")
+    public ResponseEntity<Pet> getPetById(@PathVariable("id") Long id){
+        Pet pet = petService.findPetById(id);
+        return new ResponseEntity<>(pet, HttpStatus.OK);
+    }
+
+}
+```
+	
+#### Testare cu Postman
+
+Get pentru toate elementele
+![find_all](https://user-images.githubusercontent.com/39569343/143069933-c2e950bd-a838-4471-9f2e-5cafb0fcc35d.png)
+	
+Get pentru un element cu id specific
+![find_by_id](https://user-images.githubusercontent.com/39569343/143069943-c0de19f9-30a8-494b-aaa1-ceed68ab3df8.png)
+	
+#### *2. Implementați operațiile de Post si Put pentru entitatea considerata in cadrul proiectului propriu utilizând paradigma API.*	
+	
+PetResource.java - RestController
+```java
+@RestController
+@RequestMapping("/pet")
+public class PetResource {
+    private final PetService petService;
+
+    public PetResource(PetService petService){
+        this.petService = petService;
+    }
+	
+    // ...
+
+    @PostMapping("/add")
+    public ResponseEntity<Pet> addPet(@RequestBody Pet pet){
+        Pet newPet = petService.addPet(pet);
+        return new ResponseEntity<>(newPet, HttpStatus.OK);
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<Pet> editPet(@RequestBody Pet pet){
+        Pet editPet = petService.updatePet(pet);
+        return new ResponseEntity<>(editPet, HttpStatus.OK);
+    }
+}
+```
+
+#### Testare POST si PUT 
+	
+![post_pet](https://user-images.githubusercontent.com/39569343/143071004-f70208f5-25ef-4aa3-933d-4216059952e1.png)
+
+![edit_put](https://user-images.githubusercontent.com/39569343/143071039-2bdaffe8-dbb0-4ed6-9c15-632a5d2d817f.png)
+	
 </details>
 
 ## _**Lab 6**_
