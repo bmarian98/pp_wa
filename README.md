@@ -1153,6 +1153,369 @@ public class PetResource {
 ## _**Lab 6**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 6!</summary>
+	
+### _**Exercitii:**_
+	
+#### *1. Creați pagini web in care sa utilizati operatiile CRUD API implementate in laboratorul 5.*
+Link catre frontend
+	
+https://github.com/bmarian98/frontend_shelter
+	
+Realizarea paginilor s-a realizat cu framwork-ul Angular
+
+Crearea unei interfete asemanatoare cu modelul
+
+/app/pet/pet.ts
+```ts
+export interface Pet{
+    id: number;
+    name: string;
+    species: string;
+    dateBirth: string;
+    imageUrl: string;
+    sex: string;
+}	
+```
+
+/app/pet/pet.service.ts 
+```ts
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Pet } from './pet'
+
+@Injectable({
+    providedIn: 'root'
+})
+
+export class PetService {
+    private apiServerUrl = '';
+
+    constructor(private http: HttpClient) {}
+
+    public getPets(): Observable<Pet[]>{
+        return this.http.get<Pet[]>(`${this.apiServerUrl}/pet/all`);
+    }
+
+    public addPet(pet: Pet): Observable<Pet>{
+        return this.http.post<Pet>(`${this.apiServerUrl}/pet/add`, pet);
+    }
+
+    public updatePet(pet: Pet): Observable<Pet>{
+        return this.http.put<Pet>(`${this.apiServerUrl}/pet/edit`, pet);
+    }
+
+    public deletePet(petId: number): Observable<void>{
+        return this.http.delete<void>(`${this.apiServerUrl}/pet/delete/${petId}`);
+    }
+
+}
+```
+	
+app.components.ts
+```ts
+import { Component, NgModule, OnInit } from '@angular/core';
+import { Pet } from './pet/pet';
+import { PetService } from './pet.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { NgForm } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+
+export class AppComponent implements OnInit {
+  public pets: Pet[] = [];
+  public editPet: Pet | undefined;
+  public infoPet: Pet | undefined;
+
+  constructor(private petService: PetService) {}
+
+  ngOnInit() {
+    this.getPets();
+  }
+
+  public getPets(): void{
+    this.petService.getPets().subscribe(
+    (response: Pet[]) =>{
+      this.pets = response;
+    },
+    (error: HttpErrorResponse) =>{
+      alert(error.message);
+    }
+    )
+  }
+
+  public onAddPet(addForm: NgForm): void{
+
+    var a;
+    if((a = document.getElementById('add-pet-form')) !== null){
+
+    a.click();
+    this.petService.addPet(addForm.value).subscribe(
+      (response: Pet) => {
+        console.log(response);
+        this.getPets();
+        addForm.reset();
+      },
+      (error: HttpErrorResponse) =>{
+        alert(error);
+        addForm.reset();
+      }
+    );
+    }
+  }
+
+  public onUpdatePet(pet: Pet): void {
+    this.petService.updatePet(pet).subscribe(
+      (response: Pet) => {
+        console.log(response);
+        this.getPets();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+
+  public onOpenModal(pet: Pet | null, mode: string) : void{
+    const container = document.getElementById('main-container');
+    console.log("container:" + container);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.style.display = 'none';
+    btn.setAttribute('data-toggle', 'modal');
+
+    if(mode === 'add'){
+      btn.setAttribute('data-target', '#addPetModal');
+    }
+
+    if(mode === 'edit'){
+      
+      if(pet){
+      this.editPet = pet;
+      }
+
+      btn.setAttribute('data-target', '#editPetModal');
+    }
+
+    if(mode === 'info'){
+      if(pet){
+        this.infoPet = pet;
+        }
+      btn.setAttribute('data-target', '#infoPetModal');
+    }
+
+    if(container !== null)
+      container.appendChild(btn);
+
+    btn.click();
+  }
+}
+```
+
+app.component.html
+```html
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" style="color:white;">Adapost animale</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarColor02">
+     <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+           <a class="nav-link" (click)="onOpenModal(null, 'add')">Adaugare animal<span class="sr-only">(current)</span></a>
+        </li>
+     </ul>
+  </div>
+</nav>
+
+<div class="container mt-3" id="main-container">
+    <div class="row">
+        <div  *ngFor="let pet of pets" class="col-md-3 col-xl-3">
+            <div class="card m-b-30">
+                <div class="card-body row" >
+                      <a href=""><img src="{{pet?.imageUrl}}" alt="pet_image" class="card-img-top"></a>   
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item text-center"><i class="fa fa-paw float-center"></i> {{pet.name}} </li>
+                </ul>
+            
+                <div class="card-body">
+                  <div class="float-right btn-group btn-group-sm">
+                        <a (click)="onOpenModal(pet, 'edit')" class="btn btn-primary tooltips" data-placement="top" data-toggle="tooltip" data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
+                        <a (click)="onOpenModal(pet, 'info')" class="btn btn-info tooltips" data-placement="top" data-toggle="tooltip" data-original-title="Info"><i class="fa fa-book"></i></a>
+                  </div>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Pet Modal -->
+<div class="modal fade" id="addPetModal" tabindex="-1" role="dialog" aria-labelledby="addPetModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addPetModalLabel">Adaugare animal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form #addForm="ngForm" (ngSubmit)="onAddPet(addForm)">
+          <div class="form-group">
+            <label for="name">Nume</label>
+            <input type="text" ngModel name="name" class="form-control" id="name" placeholder="Nume" required>
+          </div>
+          <div class="form-group">
+            <label for="dateBirth">Data nastere</label>
+            <input type="text" ngModel name="dateBirth" class="form-control" id="dateBirth" placeholder="Data nastere" required>
+          </div>
+          <div class="form-group">
+            <label for="species">Specie</label>
+            <input type="text" ngModel name="species" class="form-control" id="species" placeholder="Specie" required>
+          </div>
+          <div class="form-group">
+            <label for="sex">Imagine</label>
+            <input type="text" ngModel name="imageUrl" class="form-control" id="imageUrl" placeholder="Imagine">
+          </div>
+          <div class="form-group">
+            <label for="sex">Sex</label>
+            <input type="text" ngModel name="sex" class="form-control" id="sex" placeholder="Sex" required>
+          </div>
+           <div class="modal-footer">
+             <button type="button" id="add-pet-form" class="btn btn-danger" data-dismiss="modal">Inchide</button>
+             <button [disabled]="addForm.invalid" type="submit" class="btn btn-success" >Salveaza</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editPetModal" tabindex="-1" role="dialog" aria-labelledby="editPetModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+     <div class="modal-content">
+        <div class="modal-header">
+           <h5 class="modal-title" id="editPetModalLabel">Editare animal</h5>
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+           </button>
+        </div>
+        <div class="modal-body">
+           <form #editForm="ngForm">
+              <div class="form-group">
+                 <label for="name">Nume</label>
+                 <input type="text" ngModel="{{editPet?.name}}" name="name" class="form-control" id="name" aria-describedby="emailHelp" placeholder="Nume">
+              </div>
+              <input type="hidden" ngModel="{{editPet?.id}}" name="id" class="form-control" id="id" placeholder="id">
+              
+              <div class="form-group">
+                 <label for="dateBirth">Data naster</label>
+                 <input type="text" ngModel="{{editPet?.dateBirth}}" name="dateBirth" class="form-control" id="dateBirth" placeholder="Data nastere">
+              </div>
+              <div class="form-group">
+                 <label for="species">Specie</label>
+                 <input type="text" ngModel="{{editPet?.species}}" name="species" class="form-control" id="species" placeholder="Specie">
+              </div>
+              <div class="form-group">
+                 <label for="imageUrl">URL Imagine</label>
+                 <input type="text" ngModel="{{editPet?.imageUrl}}" name="imageUrl" class="form-control" id="imageUrl" placeholder="URL Imagine">
+              </div>
+              <div class="form-group">
+                 <label for="sex">Sex</label>
+                 
+                   <input type="text" ngModel name="sex" class="form-control" id="sex" placeholder="Sex" required>
+                  <!--  <div id="sex">
+                    <input type="radio" value="male" name="gender" required ngModel="{{editPet?.sex}}"> Male
+                    <input type="radio" value="female" name="gender"required ngModel="{{editPet?.sex}}"> Female
+                  </div>
+                  -->
+                 
+              </div>
+              <div class="modal-footer">
+                 <button type="button" id="" data-dismiss="modal" class="btn btn-danger">Inchide</button>
+                 <button (click)="onUpdatePet(editForm.value)" data-dismiss="modal" class="btn btn-success" >Salvare modificari</button>
+              </div>
+           </form>
+        </div>
+     </div>
+  </div>
+</div>
+
+<!-- Info Pet  -->
+<div class="modal fade" id="infoPetModal" tabindex="-1" role="dialog" aria-labelledby="infoPetModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="infoPetModalLabel">Informatii animal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body ">
+      <form #editForm="ngForm">
+        <div class="container d-flex justify-content-center">
+          <div class="row">
+        <div  >
+            <div class="card">
+                <div class="card-body row" >
+                      <a href=""><img src="{{infoPet?.imageUrl}}" alt="pet_image" class="card-img-top"></a>   
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item text-center"><i class="fa fa-paw float-center"></i> {{infoPet?.name}} </li>
+                </ul>
+            
+                
+                  <li class="list-group-item text-center">Id: {{infoPet?.id}}</li>
+                  <li class="list-group-item text-center">Data nastere: {{infoPet?.dateBirth}}</li>
+                  <li class="list-group-item text-center"> Sex: {{infoPet?.sex}}</li>
+                
+              </div>
+        </div>
+        
+    </div>
+    
+        </div>
+      </form>
+      </div>
+      <div class="modal-footer">
+             <button type="button" id="add-employee-form" class="btn btn-primary" data-dismiss="modal">Inchide</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+Serverul local al paginilor web ruleaza pe localhost:4200 se face referinta catre localhost:8080 in envinronment.ts
+```ts
+export const environment = {
+  production: false,
+  apiBaseUrl: 'http://localhost:8080'
+};
+```
+
+
+#### Rezultate
+
+Afisarea intregului continut al tabelului
+![list_all](https://user-images.githubusercontent.com/39569343/143071854-504d23c6-6abc-4882-a2fe-a16f1955716f.png)
+	
+Afisarea informatiilor
+![info](https://user-images.githubusercontent.com/39569343/143071793-6d201eb0-616d-4214-a25e-e2a5de55af2a.png)
+	
+Afisarea dupa editare
+![list_after_edit](https://user-images.githubusercontent.com/39569343/143071868-05bb324e-72b8-412b-bb5e-902a5bd1e271.png)
+	
+Editarea unui animal
+![edit_pet](https://user-images.githubusercontent.com/39569343/143071768-73fc586b-a173-47c2-a90d-195eafd430d4.png)
+	
 </details>
 
 ## _**Lab 7**_
