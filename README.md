@@ -1515,6 +1515,12 @@ Afisarea dupa editare
 	
 Editarea unui animal
 ![edit_pet](https://user-images.githubusercontent.com/39569343/143071768-73fc586b-a173-47c2-a90d-195eafd430d4.png)
+
+Adaugare animal
+![add](https://user-images.githubusercontent.com/39569343/143236887-b9a86546-e65d-4268-91fc-bc4ce637edc1.png)
+	
+Afisarea dupa adaugare
+![list_after_add](https://user-images.githubusercontent.com/39569343/143236893-9f8f889e-6e28-4e50-a49c-441666dbccbc.png)
 	
 </details>
 
