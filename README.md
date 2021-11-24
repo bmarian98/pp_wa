@@ -806,10 +806,9 @@ public class PetController {
 ##### View-uri pentru list, details, create si edit
 a. Add - petform.jsp
 ```jsp
-	<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>    
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>    
+<%@ page import="java.sql.*, java.io.*"%> 
     
 <!DOCTYPE html>
 <html>
@@ -823,16 +822,48 @@ a. Add - petform.jsp
 	<form:form method="post" action="save_pet">
 		<table>
 			<tr>
-				<td>Id:</td>
-				<td><form:input path="id" /></td>
-			</tr>
-			<tr>
 				<td>Name:</td>
 				<td><form:input path="name" /></td>
 			</tr>
+			         <tr>
+          <td>Shelter :</td>  
+          <td>
+          <select id="sel" onchange="fun()">
+			<%
+			
+			try
+			{
+				String query = "SELECT * FROM shelter";
+	        	  
+	        	  Class.forName("com.mysql.jdbc.Driver");
+	        	  Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/mvc?useSSL=false", "root", "new123");
+	        	  Statement st = con.createStatement();
+	        	  
+	        	  ResultSet rs = st.executeQuery(query);
+	        	  
+	        	  %> 
+	        	  <option selected="selected" value="-">------</option> 
+	        	  <%
+	        			  
+	        	  while(rs.next())
+	        	  {
+	        		  %>
+	        		  	<option value="<%=rs.getInt(1)%>"><%=rs.getString(2) %></option>
+	        		  <%
+	        	  }
+	        	  
+			}
+			catch(Exception e)
+			{
+				
+			}
+			
+			%>
+          </select>
+          </td>
+         </tr> 
 			<tr>
-				<td>ShelterId:</td>
-				<td><form:input path="shelterId" /></td>
+				<td><form:input path="shelterId" id="sid" type="hidden" /></td>
 			</tr>
 			<tr>
 				<td>DateBirth:</td>
@@ -849,6 +880,17 @@ a. Add - petform.jsp
 			</tr>
 		</table>
 	</form:form>
+	 <script >
+       function fun(){
+       	console.log("test");
+       	var e = document.getElementById("sel");
+       	console.log(e.value);
+       	document.getElementById("sid").value = e.value;
+       	var d = document.getElementById("sid");
+       	console.log(d.value);
+       }
+       </script>
+	
 <a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>
 </body>
 </html>
@@ -898,57 +940,108 @@ d. Edit - pet_edit_form.jsp
 ```jsp
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>  
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>  
+ <%@ page import="java.sql.*, java.io.*"%> 
 
 		<h1>Edit pet</h1>
-       <form:form method="POST" action="/SpringMVCCRUDSimple/edit_save_pet">  
+		 
+       <form:form method="PUT" action="/SpringMVCCRUDSimple/edit_save_pet">  
       	<table >  
       	<tr>
       	<td></td>  
-        	 <td><form:hidden  path="id" /></td>
+         <td><form:hidden  path="id" id="sid" /></td>
          </tr> 
          <tr>  
-		  <td>Name : </td> 
-		  <td><form:input path="name"  /></td>
+          <td>Name : </td> 
+          <td><form:input path="name" /></td>
          </tr>  
-         <tr>  
-		  <td>ShelterId :</td>  
-		  <td><form:input path="shelterId" /></td>
+         <tr>
+          <td>Shelter :</td>  
+          <td>
+          <select id="sel" onchange="fun()">
+			<%
+			
+			try
+			{
+				String query = "SELECT * FROM shelter";
+	        	  
+	        	  Class.forName("com.mysql.jdbc.Driver");
+	        	  Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/mvc?useSSL=false", "root", "new123");
+	        	  Statement st = con.createStatement();
+	        	  
+	        	  ResultSet rs = st.executeQuery(query);
+	        	  
+	        	  %> 
+	        	  <option selected="selected" value="-">------</option> 
+	        	  <%
+	        			  
+	        	  while(rs.next())
+	        	  {
+	        		  %>
+	        		  	<option value="<%=rs.getInt(1)%>"><%=rs.getString(2) %></option>
+	        		  <%
+	        	  }
+	        	  
+			}
+			catch(Exception e)
+			{
+				
+			}
+			
+			%>
+          </select>
+          </td>
          </tr> 
          <tr>  
-		  <td>DateBirth :</td>  
-		  <td><form:input path="dateBirth" /></td>
+          <td>DateBirth :</td>  
+          <td><form:input path="dateBirth" name="sel" /></td>
          </tr> 
          <tr>  
-          <td>PetSex:</td>
-		 <td><form:radiobutton path="sex" value="M" />Mascul</td>
-		<td><form:radiobutton path="sex" value="F" />Femela</td>
+          <td>Sex:</td>
+				<td><form:radiobutton path="sex" value="M" />Mascul</td>
+				<td><form:radiobutton path="sex" value="F" />Femela</td>
          </tr> 
-         
+         <tr>
+      	<td></td>  
+         <td><form:input path="shelterId" id="shelter" type="hidden" /></td>
+         </tr> 
          <tr>  
           <td> </td>  
           <td><input type="submit" value="Edit Save" /></td>  
          </tr>  
         </table>  
        </form:form>  
+       
+       <script >
+       function fun(){
+       	console.log("test");
+       	var e = document.getElementById("sel");
+       	console.log(e.value);
+       	document.getElementById("shelter").value = e.value;
+       	var d = document.getElementById("shelter");
+       	console.log(d.value);
+       }
+       </script>
+      
+       
        <a href="/SpringMVCCRUDSimple/index.jsp">HOME</a>
 ```
 	
 ##### Rezultate
 a. Add view
 	
-![Screenshot 2021-11-17 112708](https://user-images.githubusercontent.com/39569343/142173832-ba132080-a7ed-47be-a29e-afce6501c98d.png)
+![add](https://user-images.githubusercontent.com/39569343/143256651-38701fcb-eed3-42bc-8415-1053d3391d09.png)
 
 b. List view
 	
-![pet_list_add](https://user-images.githubusercontent.com/39569343/142173008-977e1204-65f2-4e3b-817a-1ce3334cf7a3.png)
+![list_after_add](https://user-images.githubusercontent.com/39569343/143256648-45826f05-1a41-4d23-967b-18b929534495.png)
 
 c. Edit view
 	
-![edit_pet](https://user-images.githubusercontent.com/39569343/142173001-f767c640-1cb5-4730-821f-6db19c78efbf.png)
+![edit](https://user-images.githubusercontent.com/39569343/143256637-f0947066-9566-4f1a-93a0-81af2d635aa8.png)
 
-d. List view
-
-![list_edit_pet](https://user-images.githubusercontent.com/39569343/142173005-d7533a63-43cf-46d0-a7a5-af1542ee9420.png)
+d. Details view
+	
+![info](https://user-images.githubusercontent.com/39569343/143256646-f36d8157-37a0-4638-8eb2-a5e60c9da300.png)
 	
 </details>
 
