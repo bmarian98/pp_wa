@@ -1620,7 +1620,9 @@ Afisarea dupa adaugare
 ## _**Lab 7**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 7!</summary>
+	
 ### **Exercitii:**
+	
 #### _*1. ORM - Object Relational Mapping – Database First.*_
 	
 Am folosit plugin-ul **POJO Generator** pentru a obtine clasa java din tabel.
