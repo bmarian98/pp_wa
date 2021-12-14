@@ -1966,6 +1966,78 @@ Tabelul dupa modificare
 ## _**Lab 9**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 9!</summary>
+	
+### **Exercitii:**
+	
+#### _*1. Dependency Injection.*_
+
+Interfata - PetRepository.java
+```java
+package ro.ppaw.shelter.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import ro.ppaw.shelter.model.pet.Pet;
+
+import java.util.Optional;
+
+public interface PetRepository extends JpaRepository<Pet, Long> {
+
+    void deletePetById(Long id);
+
+    Optional<Pet> findPetById(Long id);
+}
+```
+
+Dependency Injection este folosita prin intermediul anotarii **@Autowired**
+
+#### _*2. Nivel Servicii (sau Business Layer).*_
+
+Serviciul - PetService.java
+	
+```java
+package ro.ppaw.shelter.servicies;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ro.ppaw.shelter.exception.UserNotFoundException;
+import ro.ppaw.shelter.model.pet.Pet;
+import ro.ppaw.shelter.repository.PetRepository;
+
+import javax.transaction.Transactional;
+import java.util.List;
+
+@Service
+@Transactional
+public class PetService {
+    private final PetRepository petRepo;
+
+    @Autowired
+    public PetService(PetRepository petRepo){
+        this.petRepo = petRepo;
+    }
+
+    public Pet addPet(Pet pet){
+        return petRepo.save(pet);
+    }
+
+    public List<Pet> findAllPets(){
+        return petRepo.findAll();
+    }
+
+    public Pet updatePet(Pet pet){
+        return petRepo.save(pet);
+    }
+
+    public void deletePet(Long id){
+        petRepo.deletePetById(id);
+    }
+
+    public Pet findPetById(Long id){
+        return petRepo.findPetById(id).orElseThrow(() -> new UserNotFoundException("Pet with id " + id + " not found!"));
+    }
+}
+```
+	
 </details>
 
 ## _**Lab 10**_
