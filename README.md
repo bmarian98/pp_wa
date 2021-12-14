@@ -1736,6 +1736,181 @@ public class Pet implements Serializable {
 ## _**Lab 8**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 8!</summary>
+	
+### **Exercitii:**
+	
+#### _*1. ORM - Object Relational Mapping – Database First.*_
+
+	
+#### _*2. ORM - Object Relational Mapping – Code First.*_
+
+In cazul migrarilor trebuie adaugat **Flyway** sau **Liquibase**  sau amandoua in fisierul pom.xml
+
+```xml
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+</dependency>
+	
+# ...
+	
+<dependency>
+    <groupId>org.liquibase</groupId>
+    <artifactId>liquibase-core</artifactId>
+</dependency>
+```
+	
+In fisierul **application.yaml** se specifica care se foloseste prin paramentru enable setat pe true sau false
+	
+```yaml
+spring:
+  liquibase:
+    enabled: false
+  datasource:
+    username: postgres
+    password: new123
+    url: "jdbc:postgresql://localhost:5432/web_shelter"
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  flyway:
+    enabled: true
+
+flyway:
+  url: "jdbc:postgresql://localhost:5432"
+  schemas: web_shelter
+  user: marian
+  password: new123
+```
+
+Pentru fiecare migrare se adauga un fisier in foldrul **migration** din calea **resources/db/migraion/** cu numele vesriuni urmat de doua underscor-uri si o descriere si cu extensia **.sql**, **.xml**, **.json**, **etc**.
+
+![path](https://user-images.githubusercontent.com/39569343/145976376-8f404d20-4d8f-4769-a496-a395379d32f0.png)
+	
+**V1__PetTable.sql**
+	
+```sql
+	
+```
+
+**V2__AlterPetTable.sql**
+
+```slq
+	
+```
+
+In cazul codului scris pentru generarea tabelului, la adaugarea unui camp in clasa la executarea programului acesta va fi introdus in tabel la fel si pentru eleminare. De asemenea trebuie sa se introduca/elimine din constructo campul specificat si metodele set/get al acestuia.
+
+Adaugarea campului **test** in clasa Pet.java
+
+```java
+package ro.ppaw.shelter.model.pet;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public class Pet implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
+    private Long id;
+    private String name;
+    private String species;
+    private String dateBirth;
+    private Character sex;
+    private String imageUrl;
+    private String test;
+
+    public Pet() {}
+
+    public Pet(Long id, String test, String name, String species, String dateBirth, String imageUrl, Character sex) {
+        this.id = id;
+        this.test = test;
+        this.name = name;
+        this.species = species;
+        this.dateBirth = dateBirth;
+        this.imageUrl = imageUrl;
+        this.sex = sex;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public String getDateBirth() {
+        return dateBirth;
+    }
+
+    public void setDateBirth(String dateBirth) {
+        this.dateBirth = dateBirth;
+    }
+
+    public Character getSex() {
+        return sex;
+    }
+
+    public void setSex(Character sex) {
+        this.sex = sex;
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", species='" + species + '\'' +
+                ", dateBirth='" + dateBirth + '\'' +
+                ", sex=" + sex +
+                '}';
+    }
+}	
+```
+
+In timpul rularii programului se efectueza ALTER pe tabelul pet din baza de date de catre ORM-ul Hiberanate
+
+![alter_table](https://user-images.githubusercontent.com/39569343/145970797-84c09f9b-96d2-4f07-b265-398ab7e21adf.png)
+
+Tabelul inaintea modificarii
+
+![pet_db_before](https://user-images.githubusercontent.com/39569343/145970469-0ac8c90b-ea63-499a-961c-bb52bb4f376e.png)
+	
+Tabelul dupa modificare
+	
+![table_after_add](https://user-images.githubusercontent.com/39569343/145970818-debaaa55-f2f6-4bc0-aa73-07526fc01648.png)
+	
 </details>
 
 ## _**Lab 9**_
