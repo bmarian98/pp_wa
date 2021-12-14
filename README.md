@@ -1741,10 +1741,35 @@ public class Pet implements Serializable {
 	
 #### _*1. ORM - Object Relational Mapping – Database First.*_
 
+Script.sql
+
+```sql
+-- creare tabel shelter
+CREATE TABLE shelter(
+    id  bigserial NOT NULL,
+    address VARCHAR(255),
+    image_url VARCHAR(255)
+)
+
+-- adaugare camp test in tabelul pet
+ALTER TABLE pet ADD COLUMN test VARCHAR(200);
+```
+
+Tabelul nou creat **shelter** si campul adaugat **test**
+	
+![tales](https://user-images.githubusercontent.com/39569343/145984429-fd158202-2a62-4eae-8426-7c307d2a390e.png)
+	
+Clasa generata pe baza tabelului **pet**
+	
+![Pet](https://user-images.githubusercontent.com/39569343/145984430-d587c37b-e41b-4716-b0aa-f4543225231a.png)
+
+Clasa generata pe baza tabelului **shelter** cu noul camp adaugat **test**
+	
+![Shelter](https://user-images.githubusercontent.com/39569343/145984419-03f82b5d-c492-4ccc-ac3f-eefe8048b732.png)
 	
 #### _*2. ORM - Object Relational Mapping – Code First.*_
 
-In cazul migrarilor trebuie adaugat **Flyway** sau **Liquibase**  sau amandoua in fisierul pom.xml
+a. In cazul migrarilor trebuie adaugat **Flyway** sau **Liquibase**  sau amandoua in fisierul pom.xml
 
 ```xml
 <dependency>
@@ -1792,16 +1817,41 @@ Pentru fiecare migrare se adauga un fisier in foldrul **migration** din calea **
 **V1__PetTable.sql**
 	
 ```sql
-	
+CREATE TABLE pet (
+     id  bigserial NOT NULL,
+     date_birth VARCHAR(255),
+     image_url VARCHAR(255),
+     name VARCHAR(255),
+     sex CHAR(1),
+     species VARCHAR(255), test VARCHAR(255),
+     PRIMARY KEY (id)
+)      
 ```
 
 **V2__AlterPetTable.sql**
 
 ```slq
-	
+ALTER TABLE pet DROP COLUMN test;	
 ```
 
-In cazul codului scris pentru generarea tabelului, la adaugarea unui camp in clasa la executarea programului acesta va fi introdus in tabel la fel si pentru eleminare. De asemenea trebuie sa se introduca/elimine din constructo campul specificat si metodele set/get al acestuia.
+Outputul rularii si migrarea pentru **V1__PetTable.sql**
+	
+![output](https://user-images.githubusercontent.com/39569343/145980156-4bbbb5db-bbe4-456b-86b8-ace4cca27ed9.png)
+	
+![schema](https://user-images.githubusercontent.com/39569343/145980150-39d680f5-799c-443b-813c-ba6e033bdd8e.png)
+	
+Outputul rularii si migrarea pentru **V2__AlterPetTable.sql**
+	
+![output1](https://user-images.githubusercontent.com/39569343/145980162-ba6629cc-de9a-4cfd-825d-ef21979b2ce5.png)
+	
+![schema1](https://user-images.githubusercontent.com/39569343/145980155-92f7719d-c0db-48fe-ac96-3dd77910179d.png)
+
+	
+Continut tabel-ul de migrare - **flyway_schema_history**
+
+![db_migrations](https://user-images.githubusercontent.com/39569343/145979388-1b57f500-a907-4c08-bbdc-36a4facee46f.png)
+
+b. In cazul codului scris pentru generarea tabelului, la adaugarea unui camp in clasa la executarea programului acesta va fi introdus in tabel la fel si pentru eleminare. De asemenea trebuie sa se introduca/elimine din constructo campul specificat si metodele set/get al acestuia.
 
 Adaugarea campului **test** in clasa Pet.java
 
