@@ -1620,6 +1620,115 @@ Afisarea dupa adaugare
 ## _**Lab 7**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 7!</summary>
+### **Exercitii:**
+#### _*1. ORM - Object Relational Mapping – Database First.*_
+	
+Am folosit plugin-ul **POJO Generator** pentru a obtine clasa java din tabel.
+	
+Etape: Selectare **Databese** -> Tabelul: **Pet** ->  **POJO Generator** -> **Entity**.
+	
+![db](https://user-images.githubusercontent.com/39569343/145960715-eacd8ee4-be8e-45e6-b7e0-e2c0f6b3f94d.png)
+	
+Dupa parcurgerea etapelor de mai sus se genereaza un fisier Pet.java care contine clasa **Pet** asociata tabelui din baza de date.
+	
+![pet_class](https://user-images.githubusercontent.com/39569343/145966002-153953e8-4284-43f3-b384-c6781e1af767.png)
+
+#### _*2. ORM - Object Relational Mapping – Code First.*_
+
+**Pet.java** este modelul pe care se va genera tabelul in baza de date
+	
+```java
+package ro.ppaw.shelter.model.pet;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public class Pet implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
+    private Long id;
+    private String name;
+    private String species;
+    private String dateBirth;
+    private Character sex;
+    private String imageUrl;
+
+    public Pet() {}
+
+    public Pet(Long id, String name, String species, String dateBirth, String imageUrl, Character sex) {
+        this.id = id;
+        this.name = name;
+        this.species = species;
+        this.dateBirth = dateBirth;
+        this.imageUrl = imageUrl;
+        this.sex = sex;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public String getDateBirth() {
+        return dateBirth;
+    }
+
+    public void setDateBirth(String dateBirth) {
+        this.dateBirth = dateBirth;
+    }
+
+    public Character getSex() {
+        return sex;
+    }
+
+    public void setSex(Character sex) {
+        this.sex = sex;
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", species='" + species + '\'' +
+                ", dateBirth='" + dateBirth + '\'' +
+                ", sex=" + sex +
+                '}';
+    }
+}
+```
+	
 </details>
 
 ## _**Lab 8**_
