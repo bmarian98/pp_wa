@@ -2048,4 +2048,115 @@ public class PetService {
 ## _**Lab 11**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 11!</summary>
+	
+### **Exercitii:**
+	
+#### _*1. Cache.*_
+Pentru a implementa Caching-ul trebui sa folosim urmatoarele anotari _*@EnableCaching*_ in clasa principla si _*@Cacheable("")*_ in serviciile a caror metode vor folosi cache-ul.
+
+Clasa Principala - WebShelterApplication.java
+```java
+	@SpringBootApplication
+@EnableCaching
+public class WebShelterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(WebShelterApplication.class, args);
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
+                "Accept", "Authorization", "Origin, Accept", "X-Requested-With",
+                "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        corsConfiguration.setExposedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization",
+                "Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return new CorsFilter(urlBasedCorsConfigurationSource);
+    }
+}
+```
+PetService.java	
+```java
+@Service
+@Transactional
+public class PetService {
+    private final PetRepository petRepo;
+
+    @Autowired
+    public PetService(PetRepository petRepo){
+        this.petRepo = petRepo;
+    }
+
+    public Pet addPet(Pet pet){
+        return petRepo.save(pet);
+    }
+
+    @Cacheable("findAllPets")
+    public List<Pet> findAllPets(){
+        return petRepo.findAll();
+    }
+
+    public Pet updatePet(Pet pet){
+        return petRepo.save(pet);
+    }
+
+    public void deletePet(Long id){
+        petRepo.deletePetById(id);
+    }
+
+    @Cacheable("findPetsByShelterId")
+    public List<Pet> findPetsByShelterId(Long id){
+        return petRepo.getPetsByShelterId(id).orElseThrow(() -> new UserNotFoundException("Shelter with id: " + id + " doesn't have pets!"));
+    }
+
+    @Cacheable("findPetById")
+    public Pet findPetById(Long id){
+        return petRepo.findPetById(id).orElseThrow(() -> new UserNotFoundException("Pet with id " + id + " not found!"));
+    }
+}	
+```
+
+ShelterService.java	
+```java
+@Service
+@Transactional
+public class ShelterService {
+    private final ShelterRepository shelterRepository;
+
+    @Autowired
+    public ShelterService(ShelterRepository shelterRepository) {
+        this.shelterRepository = shelterRepository;
+    }
+
+    public Shelter addShelter(Shelter shelter){
+        return shelterRepository.save(shelter);
+    }
+
+    @Cacheable("getShelters")
+    public List<Shelter> getShelters(){
+        return  shelterRepository.findAll();
+    }
+
+    @Cacheable("getShelterById")
+    public Shelter getShelterById(Long id){
+        return shelterRepository.findShelterById(id).orElseThrow(() -> new UserNotFoundException("Shelter with id " + id + " not found!"));
+    }
+
+    public Shelter editShelterById(Shelter shelter){
+        return shelterRepository.save(shelter);
+    }
+
+
+    public void delteShelter(Long id){
+        shelterRepository.deleteShelterById(id);
+    }
+
+}	
+```
 </details>
