@@ -2052,7 +2052,7 @@ public class PetService {
 ### **Exercitii:**
 	
 #### _*1. Cache.*_
-Pentru a implementa Caching-ul trebui sa folosim urmatoarele anotari _*@EnableCaching*_ in clasa principla si _*@Cacheable("")*_ in serviciile a caror metode vor folosi cache-ul.
+Pentru a implementa Caching-ul trebui sa folosim urmatoarele anotari _**@EnableCaching**_ in clasa principla si _**@Cacheable("")**_ in serviciile a caror metode vor folosi cache-ul.
 
 Clasa Principala - WebShelterApplication.java
 ```java
