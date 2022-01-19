@@ -2050,7 +2050,7 @@ public class PetService {
 Pentru a sterge fizic fara pierderea datelor, se creeaza un tabel de tip istoric in care se va insera entitate care v-a fi eliminata din celelate tabele.
 	
 #### _*2. Stergere Logica.*_
-Pentru stergerea logica adaugam in clasa (entitatea care reprezinta tabelul din baza de date) un camp de tip bulean. In cazul in care o inregistrare se v-a dori sa fie stearsa atunci valoarea acestui camo v-a fi modificata. Cand se vor extrage datele se v-a tine cont de acest camp acest operatie se realiza prin anotarile **@SQLDelete** si **@Where**.
+Pentru stergerea logica adaugam in clasa (entitatea care reprezinta tabelul din baza de date) un camp de tip boolean. In cazul in care o inregistrare se v-a dori sa fie stearsa atunci valoarea acestui camo v-a fi modificata. Cand se vor extrage datele se v-a tine cont de acest camp acest operatie se realiza prin anotarile **@SQLDelete** si **@Where**.
 
 Pet.java - adugarea camului **deleted**
 	
