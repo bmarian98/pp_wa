@@ -2043,6 +2043,71 @@ public class PetService {
 ## _**Lab 10**_
 <details>
   <summary>Apasti pentru a deschide laboratorul 10</summary>
+	
+### **Exercitii:**
+	
+#### _*1. Stergere Fizica.*_
+Pentru a sterge fizic fara pierderea datelor, se creeaza un tabel de tip istoric in care se va insera entitate care v-a fi eliminata din celelate tabele.
+	
+#### _*2. Stergere Logica.*_
+Pentru stergerea logica adaugam in clasa (entitatea care reprezinta tabelul din baza de date) un camp de tip bulean. In cazul in care o inregistrare se v-a dori sa fie stearsa atunci valoarea acestui camo v-a fi modificata. Cand se vor extrage datele se v-a tine cont de acest camp acest operatie se realiza prin anotarile **@SQLDelete** si **@Where**.
+
+Pet.java - adugarea camului **deleted**
+	
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@SQLDelete(sql = "UPDATE pet SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
+public class Pet implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
+    private Long id;
+    private String name;
+    private String species;
+    private String dateBirth;
+    private Character sex;
+    private String imageUrl;
+    private boolean deleted = Boolean.FALSE;
+
+    @ManyToOne
+    @JoinColumn(
+            nullable = false,
+            name = "shelter_id"
+    )
+    private Shelter shelter;
+
+    public Pet() {}
+}
+	
+```
+	
+Shelter.java - adugarea camului **deleted**
+	
+```java
+@Entity
+@SQLDelete(sql = "UPDATE shelter SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
+public class Shelter implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
+    private Long id;
+
+    private String name;
+    private String address;
+    private String imageUrl;
+    private Boolean deleted = Boolean.FALSE;
+
+    public Shelter() {
+    }
+}
+```
+
+	
 </details>
 
 ## _**Lab 11**_
